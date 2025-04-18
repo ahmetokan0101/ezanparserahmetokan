@@ -283,4 +283,26 @@
 257. https://namazvakitleri.diyanet.gov.tr/tr-TR/9644/cicekdagi-icin-namaz-vakti
 258. https://namazvakitleri.diyanet.gov.tr/tr-TR/9645/kaman-icin-namaz-vakti
 259. https://namazvakitleri.diyanet.gov.tr/tr-TR/9646/kirsehir-icin-namaz-vakti
-260. https://namazvakitleri.diyanet.gov.tr/tr-TR/9647/mucur-icin-namaz-vakti
+260. https://namazvakitleri.diyanet.gov.tr/tr-TR/9647/mucur-icin-namaz-vakti                                       # Ankara
+261. https://namazvakitleri.diyanet.gov.tr/tr-TR/9206/ankara-icin-namaz-vakti
+262. https://namazvakitleri.diyanet.gov.tr/tr-TR/9225/antalya-icin-namaz-vakti
+
+                                       # Antalya
+263. https://namazvakitleri.diyanet.gov.tr/tr-TR/9225/antalya-icin-namaz-vakti
+264. https://namazvakitleri.diyanet.gov.tr/tr-TR/9225/antalya-icin-namaz-vakti
+
+                                       # Balıkesir
+265. https://namazvakitleri.diyanet.gov.tr/tr-TR/9270/balikesir-icin-namaz-vakti
+266. https://namazvakitleri.diyanet.gov.tr/tr-TR/9402/diyarbakir-icin-namaz-vakti
+267. https://namazvakitleri.diyanet.gov.tr/tr-TR/9432/elazig-icin-namaz-vakti
+268. https://namazvakitleri.diyanet.gov.tr/tr-TR/9528/isparta-icin-namaz-vakti
+269. https://namazvakitleri.diyanet.gov.tr/tr-TR/9541/istanbul-icin-namaz-vakti
+270. https://namazvakitleri.diyanet.gov.tr/tr-TR/9549/sultanbeyli-icin-namaz-vakti
+271. https://namazvakitleri.diyanet.gov.tr/tr-TR/9560/izmir-icin-namaz-vakti
+272. https://namazvakitleri.diyanet.gov.tr/tr-TR/9638/kirklareli-icin-namaz-vakti
+273. https://namazvakitleri.diyanet.gov.tr/tr-TR/9646/kirsehir-icin-namaz-vakti
+274. https://namazvakitleri.diyanet.gov.tr/tr-TR/9577/kahramanmaras-icin-namaz-vakti
+275. https://namazvakitleri.diyanet.gov.tr/tr-TR/9831/sanliurfa-icin-namaz-vakti
+276. https://namazvakitleri.diyanet.gov.tr/tr-TR/9854/sirnak-icin-namaz-vakti
+277. https://namazvakitleri.diyanet.gov.tr/tr-TR/9635/kirikkale-icin-namaz-vakti
+278. https://namazvakitleri.diyanet.gov.tr/tr-TR/9522/igdir-icin-namaz-vakti

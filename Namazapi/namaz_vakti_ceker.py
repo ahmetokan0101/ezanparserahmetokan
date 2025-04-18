@@ -14,43 +14,51 @@ class Colors:
 SELECTED_IL = None
 
 def save_url_to_file(url, il_adi):
-    # URL'leri kaydedeceğimiz dosya yolu
-    url_file = r"C:\Users\Lyrox\Desktop\Namazapi\girilen_urller.txt"
-    
-    # Klasörün var olduğundan emin ol
-    os.makedirs(os.path.dirname(url_file), exist_ok=True)
-    
-    # Dosya boşsa veya yoksa il adını başlık olarak ekle
-    if not os.path.exists(url_file) or os.path.getsize(url_file) == 0:
-        with open(url_file, 'w', encoding='utf-8') as f:
-            f.write(f"                                       ##{il_adi}\n\n")
-    
-    # Yeni il için başlık ekle
-    with open(url_file, 'r', encoding='utf-8') as f:
-        content = f.read()
-        if f"##{il_adi}" not in content and f"# {il_adi}" not in content:
-            with open(url_file, 'a', encoding='utf-8') as f:
-                f.write(f"                                       # {il_adi}\n")
-    
-    # Dosya varsa son numarayı bul, yoksa 1'den başla
-    current_number = 1
-    if os.path.exists(url_file):
+    try:
+        # URL'leri kaydedeceğimiz dosya yolu
+        url_file = os.path.join(os.getcwd(), "girilen_urller.txt")
+        print(f"\nURL dosya yolu: {url_file}")
+        
+        # Dosya boşsa veya yoksa il adını başlık olarak ekle
+        if not os.path.exists(url_file) or os.path.getsize(url_file) == 0:
+            print("Yeni dosya oluşturuluyor...")
+            with open(url_file, 'w', encoding='utf-8') as f:
+                f.write(f"                                       ##{il_adi}\n\n")
+                print(f"İl başlığı eklendi: {il_adi}")
+        
+        # Yeni il için başlık ekle
         with open(url_file, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-            if lines:
-                try:
-                    # Başlık satırlarını atla
-                    data_lines = [l for l in lines if l.strip() and not l.strip().startswith('#')]
-                    if data_lines:
-                        last_line = data_lines[-1].strip()
-                        if last_line and last_line[0].isdigit():  # Sayı ile başlıyorsa
-                            current_number = int(last_line.split('.')[0]) + 1
-                except:
-                    current_number = len([l for l in lines if l.strip() and not l.strip().startswith('#')]) + 1
-    
-    # URL'yi dosyaya ekle
-    with open(url_file, 'a', encoding='utf-8') as f:
-        f.write(f"{current_number}. {url}\n")
+            content = f.read()
+            if f"##{il_adi}" not in content and f"# {il_adi}" not in content:
+                print(f"Yeni il başlığı ekleniyor: {il_adi}")
+                with open(url_file, 'a', encoding='utf-8') as f:
+                    f.write(f"\n                                       # {il_adi}\n")
+        
+        # Dosya varsa son numarayı bul, yoksa 1'den başla
+        current_number = 1
+        if os.path.exists(url_file):
+            with open(url_file, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+                if lines:
+                    try:
+                        data_lines = [l for l in lines if l.strip() and not l.strip().startswith('#')]
+                        if data_lines:
+                            last_line = data_lines[-1].strip()
+                            if last_line and last_line[0].isdigit():
+                                current_number = int(last_line.split('.')[0]) + 1
+                                print(f"Son URL numarası: {current_number-1}")
+                    except Exception as e:
+                        print(f"Numara bulma hatası: {e}")
+                        current_number = len([l for l in lines if l.strip() and not l.strip().startswith('#')]) + 1
+        
+        # URL'yi dosyaya ekle
+        print(f"URL ekleniyor: {current_number}. {url}")
+        with open(url_file, 'a', encoding='utf-8') as f:
+            f.write(f"{current_number}. {url}\n")
+        print("URL başarıyla eklendi!")
+        
+    except Exception as e:
+        print(f"{Colors.RED}URL kaydetme hatası: {str(e)}{Colors.RESET}")
 
 def convert_turkish_chars(text):
     # Türkçe karakterleri ASCII karakterlere dönüştür
@@ -80,36 +88,35 @@ def get_prayer_times(url, retry=True):
     try:
         # URL'den veriyi çek
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7'
         }
         response = requests.get(url, headers=headers)
-        response.raise_for_status()  # HTTP hatalarını kontrol et
+        response.raise_for_status()
         html_content = response.text
         
     except requests.RequestException as e:
         print(f"{Colors.RED}Hata: Veriler çekilemedi: {str(e)}{Colors.RESET}")
         if retry:
             print(f"{Colors.GREEN}Tekrar deneniyor...{Colors.RESET}")
-            return get_prayer_times(url, retry=False)  # Bir kez daha dene
+            return get_prayer_times(url, retry=False)
         return None
     
     # HTML içeriğini parse et
     soup = BeautifulSoup(html_content, 'html.parser')
     
     # URL'den ilçe adını al
-    # Örnek URL: https://namazvakitleri.diyanet.gov.tr/tr-TR/9521/aralik-icin-namaz-vakti
     url_parts = url.split('/')
     if len(url_parts) >= 2:
-        location_part = url_parts[-1]  # "aralik-icin-namaz-vakti"
-        ilce = location_part.split('-icin-namaz-vakti')[0]  # "aralik"
-        ilce = ilce.replace('-', ' ')  # Tire işaretlerini boşluğa çevir
-        ilce = clean_district_name(ilce)  # (v) ve v eklerini temizle
+        location_part = url_parts[-1]
+        ilce = location_part.split('-icin-namaz-vakti')[0]
+        ilce = ilce.replace('-', ' ')
+        ilce = clean_district_name(ilce)
         
-        # Global il değişkenini kullan
         global SELECTED_IL
         il = SELECTED_IL
         
-        # Eğer ilçe adı il adıyla aynıysa merkez olarak değiştir
         if ilce.lower() == il.lower():
             ilce = "merkez"
     else:
@@ -117,34 +124,32 @@ def get_prayer_times(url, retry=True):
         return None
     
     # İl ve ilçe adını düzgün formatlayalım
-    il = convert_turkish_chars(il).title()  # İl adını düzgün formatlayalım
-    ilce = convert_turkish_chars(ilce).lower()  # İlçe adını küçük harfe çevirelim
+    il = convert_turkish_chars(il).title()
+    ilce = convert_turkish_chars(ilce).lower()
     
-    # Yıllık namaz vakitlerini içeren tabloyu bul
-    tables = soup.find_all('table')
+    # Namaz vakitlerini içeren div'i bul
+    prayer_divs = soup.find_all('div', {'class': 'table-responsive'})
     prayer_table = None
     max_rows = 0
-    
-    for table in tables:
-        rows = table.find_all('tr')
-        if len(rows) > max_rows:  # En çok satırı olan tabloyu seç (yıllık tablo)
-            header_cells = rows[0].find_all(['th', 'td']) if rows else []
-            if len(header_cells) >= 8:  # En az 8 sütun olmalı
-                header_texts = [cell.get_text(strip=True) for cell in header_cells]
-                if 'İmsak' in header_texts and 'Güneş' in header_texts:  # Namaz vakti tablosu olduğundan emin ol
-                    max_rows = len(rows)
-                    prayer_table = table
+
+    # En uzun tabloyu bul (yıllık tablo)
+    for div in prayer_divs:
+        table = div.find('table')
+        if table:
+            rows = table.find_all('tr')
+            if len(rows) > max_rows:
+                max_rows = len(rows)
+                prayer_table = table
     
     if not prayer_table:
-        print(f"{Colors.RED}Hata: Yıllık namaz vakitleri tablosu bulunamadı.")
-        print("Bulunan tablolar ve satır sayıları:")
-        for i, table in enumerate(tables):
-            rows = table.find_all('tr')
-            print(f"Tablo {i+1}: {len(rows)} satır{Colors.RESET}")
+        print(f"{Colors.RED}Hata: Yıllık namaz vakitleri tablosu bulunamadı.{Colors.RESET}")
+        print("Bulunan tablo sayısı:", len(prayer_divs))
         return None
+
+    print(f"{Colors.GREEN}Bulunan tablo satır sayısı: {max_rows}{Colors.RESET}")
     
     # Klasör yolunu ayarla
-    folder_name = r"C:\Users\Lyrox\Documents\GitHub\vakitler\vakitler"
+    folder_name = os.path.join(os.getcwd(), "vakitler")
     
     # Klasörü oluştur (eğer yoksa)
     if not os.path.exists(folder_name):
@@ -152,7 +157,7 @@ def get_prayer_times(url, retry=True):
     
     # Dosya adını oluştur
     file_name = os.path.join(folder_name, f"{il}_{ilce}.txt")
-    print(f"Oluşturulan dosya adı: {file_name}")  # Debug için dosya adını yazdır
+    print(f"Oluşturulan dosya adı: {file_name}")
     
     # Verileri dosyaya kaydet
     with open(file_name, 'w', encoding='utf-8') as f:
@@ -160,22 +165,12 @@ def get_prayer_times(url, retry=True):
         rows = prayer_table.find_all('tr')
         for row in rows:
             cols = row.find_all(['th', 'td'])
-            if len(cols) >= 8:  # Tüm sütunların var olduğundan emin ol
-                # Her sütundaki metni al ve temizle
+            if len(cols) >= 8:
                 values = [col.get_text(strip=True) for col in cols[:8]]
-                
-                # Boş değer kontrolü
-                if any(values):  # Eğer en az bir değer doluysa
-                    # HTML formatında yaz
+                if any(values):
                     f.write("                                            <tr>\n")
-                    f.write(f"                                                <td>{values[0]}</td>\n")
-                    f.write(f"                                                <td>{values[1]}</td>\n")
-                    f.write(f"                                                <td>{values[2]}</td>\n")
-                    f.write(f"                                                <td>{values[3]}</td>\n")
-                    f.write(f"                                                <td>{values[4]}</td>\n")
-                    f.write(f"                                                <td>{values[5]}</td>\n")
-                    f.write(f"                                                <td>{values[6]}</td>\n")
-                    f.write(f"                                                <td>{values[7]}</td>\n")
+                    for value in values:
+                        f.write(f"                                                <td>{value}</td>\n")
                     f.write("                                            </tr>\n")
     
     return file_name
@@ -185,7 +180,7 @@ if __name__ == "__main__":
     print("-" * 50)
     
     # Klasör yolunu ayarla
-    folder_name = r"C:\Users\Lyrox\Documents\GitHub\vakitler\vakitler"
+    folder_name = os.path.join(os.getcwd(), "vakitler")
     
     # Klasörü oluştur (eğer yoksa)
     if not os.path.exists(folder_name):
