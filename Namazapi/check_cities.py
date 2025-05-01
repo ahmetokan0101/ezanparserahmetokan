@@ -156,13 +156,15 @@ def main():
             content = f.read()
             
         # Dart dosyasından verileri çıkar
-        pattern = r'City\(name: \'([^\']+)\', districts: \[([^\]]+)\]\)'
-        matches = re.findall(pattern, content)
+        pattern = r'City\(\s*name:\s*\'([^\']+)\',\s*districts:\s*\[(.*?)\],\s*\),'
+        matches = re.findall(pattern, content, re.DOTALL)
         
         cities_data = {}
         for city, districts_str in matches:
-            districts = [d.strip().strip("'") for d in districts_str.split(',')]
-            cities_data[city] = districts
+            districts = []
+            for district in re.findall(r"\'([^\']+)\'", districts_str):
+                districts.append(district.strip())
+            cities_data[city] = [d for d in districts if d]  # Boş string'leri çıkar
             
         # Tüm il ve ilçeleri kontrol et
         check_cities(cities_data)
